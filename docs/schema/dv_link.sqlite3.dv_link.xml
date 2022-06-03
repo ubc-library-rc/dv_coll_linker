@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="./dv_link.sqlite3" schema="dv_link" type="SQLite - 3.32.3">
+   <tables>
+      <table name="children" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="parent_id" nullable="true" remarks="" size="2000000000" type="INTEGER" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="parent_alias" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="alias" foreignKey="" implied="false" onDeleteCascade="false" table="collections"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="child_id" nullable="true" remarks="" size="2000000000" type="INTEGER" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="3" name="child_alias" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="alias" foreignKey="" implied="false" onDeleteCascade="false" table="collections"/>
+         </column>
+      </table>
+      <table name="collections" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="id" nullable="true" remarks="" size="2000000000" type="INTEGER" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="alias" nullable="false" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <child column="child_alias" foreignKey="" implied="false" onDeleteCascade="false" table="children"/>
+            <child column="parent_alias" foreignKey="" implied="false" onDeleteCascade="false" table="children"/>
+            <child column="child" foreignKey="" implied="false" onDeleteCascade="false" table="links"/>
+            <child column="parent" foreignKey="" implied="false" onDeleteCascade="false" table="links"/>
+            <child column="dv_alias" foreignKey="" implied="false" onDeleteCascade="false" table="studies"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="name" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <primaryKey column="alias" sequenceNumberInPK="1"/>
+         <index name="collections_s_pk" unique="true">
+            <column ascending="true" name="alias"/>
+         </index>
+         <index name="sqlite_autoindex_collections_1" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="sqlite_autoindex_collections_2" unique="true">
+            <column ascending="true" name="alias"/>
+         </index>
+         <index name="sqlite_autoindex_collections_3" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="links" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="pid" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="pid" foreignKey="" implied="false" onDeleteCascade="false" table="studies"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="parent" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="alias" foreignKey="" implied="false" onDeleteCascade="false" table="collections"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="child" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="alias" foreignKey="" implied="false" onDeleteCascade="false" table="collections"/>
+         </column>
+      </table>
+      <table name="raw_data" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="last_check" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="last_check" foreignKey="" implied="false" onDeleteCascade="false" table="status"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="search_json" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+      </table>
+      <table name="status" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="last_check" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <child column="last_check" foreignKey="" implied="false" onDeleteCascade="false" table="raw_data"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="last_count" nullable="true" remarks="" size="2000000000" type="INT" typeCode="4"/>
+         <primaryKey column="last_check" sequenceNumberInPK="1"/>
+         <index name="status_s_pk" unique="true">
+            <column ascending="true" name="last_check"/>
+         </index>
+         <index name="sqlite_autoindex_status_1" unique="true">
+            <column ascending="true" name="last_check"/>
+         </index>
+      </table>
+      <table name="studies" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="10" id="0" name="pid" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <child column="pid" foreignKey="" implied="false" onDeleteCascade="false" table="links"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="1" name="dv_alias" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12">
+            <parent column="alias" foreignKey="" implied="false" onDeleteCascade="false" table="collections"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="2" name="title" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="3" name="created_time" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="10" id="4" name="updated_time" nullable="true" remarks="" size="2000000000" type="TEXT" typeCode="12"/>
+         <primaryKey column="pid" sequenceNumberInPK="1"/>
+         <index name="studies_s_pk" unique="true">
+            <column ascending="true" name="pid"/>
+         </index>
+         <index name="sqlite_autoindex_studies_1" unique="true">
+            <column ascending="true" name="pid"/>
+         </index>
+      </table>
+   </tables>
+</database>

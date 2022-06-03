@@ -1,0 +1,17 @@
+site_name: Dataverse Collection Linker 
+docs_dir: 'docs'
+nav:
+  - Overview: index.md
+extra_css:
+  - css/extra.css
+markdown_extensions:
+  - smarty
+  - toc:
+      permalink: True
+  - codehilite:
+      guess_lang: False
+      linenums: False
+      use_pygments: False
+  - attr_list
+
+theme: readthedocs

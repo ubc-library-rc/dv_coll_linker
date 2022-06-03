@@ -1,0 +1,35 @@
+datasetlinkingdataverse
+dataverselinkingdataverse
+
+Dataverse names:
+select id, alias, name from dataverse;
+
+
+select dataverse.name from dvobject inner join dataverse on dvobject.id=dataverse.id where dvobject.id=95314;
+
+SELECT datasetlinkingdataverse.dataset_id AS dataset_id, datasetlinkingdataverse.linkingdataverse_id, 
+dataverse.name  AS dv_name 
+FROM datasetlinkingdataverse 
+INNER JOIN dataverse 
+ON dataverse.id=datasetlinkingdataverse.linkingdataverse_id;
+
+
+
+SELECT dataverselinkingdataverse.dataverse_id AS dv_id, 
+dv.alias AS dv_alias,
+dv.name as dv_name,
+dataverselinkingdataverse.linkingdataverse_id AS linkdv_id, 
+targ.alias AS link_alias,
+targ.name AS linkdv_name 
+FROM dataverselinkingdataverse
+INNER JOIN dataverse AS dv
+ON dv.id=dataverselinkingdataverse.dataverse_id
+INNER JOIN dataverse AS targ
+ON targ.id = dataverselinkingdataverse.linkingdataverse_id
+ORDER BY linkdv_name;
+
+\copy (SELECT dataverselinkingdataverse.dataverse_id AS dv_id, dv.name as dv_name, dataverselinkingdataverse.linkingdataverse_id AS linkdv_id, targ.name AS linkdv_name FROM dataverselinkingdataverse INNER JOIN dataverse AS dv ON dv.id=dataverselinkingdataverse.dataverse_id INNER JOIN dataverse AS targ ON targ.id = dataverselinkingdataverse.linkingdataverse_id ORDER BY linkdv_name) TO '/home/plesack/tmp/linked_dvs.csv' With CSV DELIMITER ',' HEADER
+
+\copy (select dataverselinkingdataverse.dataverse_id as dv_id, dv.alias as dv_alias, dv.name as dv_name, dataverselinkingdataverse.linkingdataverse_id as linkdv_id, targ.alias as linkdv_alias, targ.name as linkdv_name from dataverselinkingdataverse inner join dataverse as dv on dv.id=dataverselinkingdataverse.dataverse_id inner join dataverse as targ on targ.id = dataverselinkingdataverse.linkingdataverse_id order by linkdv_name) to '/home/plesack/tmp/linked_dvs.tsv' with csv delimiter e'\t' header
+
+
