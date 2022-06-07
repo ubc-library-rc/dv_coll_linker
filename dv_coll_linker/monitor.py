@@ -85,6 +85,8 @@ def populate_db(conn:sqlite3.Connection,
     Updates the database with linking dataverse info
     '''
     cursor = conn.cursor()
+    orig_coll = set(cursor.execute('SELECT * FROM collections;').fetchall())
+    orig_children = set(cursor.execute('SELECT * FROM children').fetchall())
     for rec in collections:
         try:
             cursor.execute('INSERT INTO collections VALUES (?, ?, ?)', rec)
@@ -102,6 +104,13 @@ def populate_db(conn:sqlite3.Connection,
                             'WHERE parent_alias=? AND child_alias=?'),
                             list(rec) + [rec[1], rec[3]])
         conn.commit()
+    #set theory
+    cursor.executemany(('DELETE FROM children WHERE parent_id=? AND parent_alias=?'
+                        'AND child_id=? AND child_alias=?;'),
+                        orig_children - {tuple(x) for x in children})
+    cursor.executemany(('DELETE from collections WHERE id=? AND alias=? '
+                        'AND name=?'), orig_coll-{tuple(x) for x in collections})
+    conn.commit()
 
 def fetch_parent_child_collections(conn:sqlite3.Connection)->list:
     '''
