@@ -37,7 +37,7 @@ def create_link(pid:str, parent:str, url:str, key:str, timeout:int=100) -> bool:
     except (requests.exceptions.HTTPError, requests.exceptions.JSONDecodeError):
         LOGGER.exception('Requests Error')
         return False
-    LOGGER.info('%s linked', pid)
+    LOGGER.info('%s linked to %s', pid, parent)
     return True
 
 def unlink(pid:str, parent:str, url:str, key:str, timeout:int=100) -> bool:
@@ -69,5 +69,5 @@ def unlink(pid:str, parent:str, url:str, key:str, timeout:int=100) -> bool:
             '              that the link did not exist in the first place.'))
         LOGGER.debug(unlinky.json())
         return False
-    LOGGER.info('%s unlinked', pid)
+    LOGGER.info('%s unlinked from %s', pid, parent)
     return True

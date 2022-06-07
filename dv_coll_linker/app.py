@@ -70,7 +70,7 @@ def argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=('Study level linker for Dataverse '
                                      'installations. Finds collection level links and '
                                      'automatically adds study-level links for each '
-                                     'found collection. Addresses issues as noted here'
+                                     'found collection. Addresses issues as noted here '
                                      'https://groups.google.com/g/dataverse-community/'
                                      'c/DDmVelt3Zfk'))
     parser.add_argument('-u', '--url',
@@ -132,9 +132,7 @@ def console_logger(level:int) -> logging.getLogger:
     '''
     Logging to console only.
     '''
-    #logger = logging.getLogger(__name__)
-    #Using the root logger will format submodule logs
-    logger = logging.getLogger()
+    logger = logging.getLogger()#Use root logger to format submodule logs
     console_out = logging.StreamHandler()
     console_out.setFormatter(FORMATTER)
     logger.addHandler(console_out)
@@ -146,7 +144,7 @@ def rotating_logger(path:str, level:int, fname='dv_coll_linker.log') -> logging.
     Rotating log called called logname, where logname is the full
     path (ie, /path/to/
     '''
-    #logger = logging.getLogger(__name__)#root logger
+    #logger = logging.getLogger(__name__)#if you don't want formatting for submodules
     logger = logging.getLogger()#root logger
     for name in ['linker', 'monitor', 'search']:
         logging.getLogger(name).setLevel(LEVEL)
@@ -166,7 +164,8 @@ def main():
     args = argument_parser().parse_args()
     os.makedirs(os.path.split(os.path.expanduser(args.dbname))[0], exist_ok=True)
     os.makedirs(os.path.expanduser(args.log), exist_ok=True)
-    mainlog = rotating_logger(args.log, logging.WARNING)
+    #mainlog = rotating_logger(args.log, logging.WARNING)
+    mainlog = console_logger(logging.INFO)
 
     #create database if if doesn't exist
     conn = monitor.init(os.path.expanduser(args.dbname))
@@ -177,7 +176,7 @@ def main():
     cursor.execute('DELETE FROM status')
 
     #Populate with data if running on server, otherwise nothing
-    collections, children = monitor.get_pg_data(args.database, args.user,
+    collections, children = monitor.get_pg_data(args.dvdbname, args.user,
                                                 args.password, args.port)
     if collections:
         monitor.populate_db(conn, collections, children)
@@ -208,27 +207,34 @@ def main():
         #Strip nonexistent studies out just to keep things current
         monitor.purge_nonexistent(conn, allrecs)
 
-    #And now the magic happens
-    for branch in family_tree:
-        new = [x for x in allrecs['data']['items'] if
-              datetime.datetime.strptime(x['updatedAt'], TIMEFMT) >
-              datetime.datetime.strptime(date, TIMEFMT) and
-              x['identifier_of_dataverse'] == branch[1]]
-        for item in new:
-            mainlog.debug('%s\t%s\t%s\t%s',
-                         item['global_id'], branch[0],
-                         branch[1], item['identifier_of_dataverse'])
-            mainlog.info('Creating link %s to %s', item["global_id"], branch[0])
-            if linker.create_link(item['global_id'], branch[0], args.url, args.key):
-                monitor.add_link(conn, item['global_id'], branch[0], branch[1])
+        #And now the magic happens
+        for branch in family_tree:
+            new = [x for x in allrecs['data']['items'] if
+                  datetime.datetime.strptime(x['updatedAt'], TIMEFMT) >
+                  datetime.datetime.strptime(date, TIMEFMT) and
+                  x['identifier_of_dataverse'] == branch[1]]
+            for item in new:
+                mainlog.debug('%s\t%s\t%s\t%s',
+                             item['global_id'], branch[0],
+                             branch[1], item['identifier_of_dataverse'])
+                mainlog.info('Creating link %s to %s', item["global_id"], branch[0])
+                if linker.create_link(item['global_id'], branch[0], args.url, args.key):
+                    monitor.add_link(conn, item['global_id'], branch[0], branch[1])
 
-            #Unlinking isn't needed as you're linking a collection and
-            #deleting a study would delete the link (presumably). If you
-            #need to delete, you can do this.
-            #mainlog.info('Deleting link %s from %s', item["global_id"], branch[0])
-            #if linker.unlink(item['global_id'], branch[0], args.url, args.key)
-            #    monitor.remove_link(conn, item['global_id'], branch[0], branch[1])
+                #Unlinking isn't needed as you're linking a collection and
+                #deleting a study would delete the link (presumably). If you
+                #need to delete, you can do this.
+                #mainlog.info('Deleting link %s from %s', item["global_id"], branch[0])
+                #if linker.unlink(item['global_id'], branch[0], args.url, args.key):
+                #    monitor.remove_link(conn, item['global_id'], branch[0], branch[1])
 
+    #Unlink and remove old links from deleted collections
+    for gone in monitor.check_unlink(conn):
+        #mainlog.info('Removing link for %s', gone)
+        if linker.unlink(gone[0], gone[1], args.url, args.key):
+            mainlog.info('Removed link for %s', gone)
+            monitor.remove_link(conn, *gone)
+            mainlog.info('Removed %s from links table', gone[0])
     conn.commit()
     conn.close()
 
@@ -251,6 +257,12 @@ def testme():
     logger.info('here is a representation of set length %s',len({1,3,9}))
     logger.info('view set: %s',{1,32,389,32})
     logger.info('multiple values %s, %s', 'paul', {2,3,798})
+    import sqlite3
+    conn = sqlite3.Connection('/Users/paul/Documents/Work/Projects/dv_coll_linker/tmp/testme_del.db')
+    for gone in monitor.check_unlink(conn):
+        if linker.unlink(gone[0], gone[1], args.url, args.key):
+            monitor.remove_link(conn, *gone)
+    logger.info(monitor.check_unlink(conn))
 
 if __name__ == '__main__':
-    pass
+   main()

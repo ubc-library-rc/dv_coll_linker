@@ -39,7 +39,6 @@ def init(dbname:str) -> sqlite3.Connection:
     #sqlite3.IntegrityError
     create = ilib.read_text(data, 'create_tables.sql').split('\n\n')
     #create = [x.replace('\n', ' ') for x in create]
-    #print(create)
     conn = sqlite3.Connection(dbname)
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;')
@@ -126,14 +125,24 @@ def add_single_study(conn:sqlite3.Connection, **kwargs) -> None:
     cursor.execute('SELECT pid, updated_time FROM studies WHERE pid =?;',
                    (values[0],))
     out = cursor.fetchone()
-    if out and out[1] != values[4]:
+    if out and out[1] == values[4]:#record exists
+        LOGGER.info('Existing study record')
+        return
+    if out and out[1] != values[4]:#record updated
+        LOGGER.info('Updated study record')
         cursor.execute(('UPDATE studies SET pid=?, dv_alias=?, title=?, '
                         'created_time=?, updated_time=? WHERE pid=?;'),
                         list(values) + [values[0]])
+        conn.commit()
         return
+    #new record
     cursor.execute('INSERT INTO studies VALUES (?, ?, ?, ?, ?);',
                    values)
+
+    LOGGER.info('Added record to studies: %s', values)
     conn.commit()
+    LOGGER.debug('Committed transaction')
+    return
 
 def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
     '''
@@ -141,11 +150,16 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
     '''
     newpids = {x['global_id'] for x in allrecs['data']['items']}
     cursor = conn.cursor()
-    oldpids = set(cursor.execute('SELECT DISTINCT pid FROM studies;').fetchall())
+    #oldpids = set(cursor.execute('SELECT DISTINCT pid FROM studies;').fetchall())
+
+    oldpids = {x[0] for x in cursor.execute('SELECT DISTINCT pid FROM studies;').fetchall()}
     if not oldpids:
         return
     #remove the difference of sets
     diff = oldpids - newpids
+    LOGGER.debug('oldpids: %s', oldpids)
+    LOGGER.debug('newpids: %s', newpids)
+    LOGGER.debug('PIDs to purge: %s', diff)
     if diff:
         LOGGER.info('Purging %s old records', len(diff))
         cursor.executemany('DELETE FROM studies WHERE pid=?;', diff)
@@ -169,6 +183,7 @@ def add_link(conn:sqlite3.Connection, pid:str, parent: str, child: str) -> None:
     desc
     '''
     cursor = conn.cursor()
+    print(pid, parent, child)
     cursor.execute('INSERT INTO links VALUES(?, ?, ?);',
                    (pid, parent, child))
     conn.commit()
@@ -179,8 +194,18 @@ def check_unlink(conn:sqlite3.Connection)-> tuple:
     does not. That is, it detects the items in a collection that has been unlinked
     from a parent
     '''
-    #TODO check for studies from collections that were linked previously
-    #cursor.execute('SELECT pid FROM links WHERE?)
+    cursor = conn.cursor()
+    children = set(cursor.execute('SELECT parent_alias, child_alias FROM children').fetchall())
+    checkme = set(cursor.execute('SELECT parent, child FROM links').fetchall())
+    diff = checkme - children
+    LOGGER.debug('children: %s',children)
+    LOGGER.debug('Current links: %s', checkme)
+    pids = []
+    for coll in diff:
+        cursor.execute('SELECT * FROM links WHERE parent=? AND child=?', coll)
+        pids += list(cursor.fetchall())
+    LOGGER.info('PIDs to unlink and delete from table: %s', pids)
+    return tuple(pids)
 
 def remove_link(conn:sqlite3.Connection, pid:str, parent: str, child: str) -> None:
     '''
