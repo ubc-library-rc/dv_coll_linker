@@ -13,15 +13,21 @@ This module basically acts as a singleton object on import.
 import json
 import logging
 import sqlite3
-import sys
+#import sys
+import pkg_resources
 
 LOGGER = logging.getLogger(__name__)
 
-if sys.version_info[1] >= 7:
-    import importlib.resources as ilib
-else:
-    LOGGER.warning('Using Python 3.6 or below')
-    import importlib_resources as ilib
+#if sys.version_info[1] >= 7:
+#    import importlib.resources as ilib
+#    try:
+#        from . import data
+#    except ImportError:
+#        import data
+#else:
+#    LOGGER.warning('Using Python 3.6 or below')
+#    #import importlib_resources as ilib
+#    import pkg_resources
 
 try:
     import psycopg2
@@ -29,16 +35,23 @@ try:
 except (ModuleNotFoundError, ImportError):
     NOPG = True
 
-try:
-    from . import data
-except ImportError:
-    import data
-
 def init(dbname:str) -> sqlite3.Connection:
     '''Intialize database with {dbname}.'''
     #sqlite3.IntegrityError
-    create = ilib.read_text(data, 'create_tables.sql').split('\n\n')
-    #create = [x.replace('\n', ' ') for x in create]
+
+    #if sys.version_info[1] >= 7:
+    #    create = ilib.read_text(data, 'create_tables.sql').split('\n\n')
+    #    #create = [x.replace('\n', ' ') for x in create]
+    #else:
+    #    #pkg_resources.resource_filename('dv_coll_linker', 'data/create_tables.sql')
+    #    with open(pkg_resources.resource_filename('dv_coll_linker',
+    #                                              'data/create_tables.sql'),
+    #            'r', encoding='utf-8') as fil:
+    #        create = fil.read().split('\n\n')
+    with open(pkg_resources.resource_filename('dv_coll_linker',
+                                              'data/create_tables.sql'),
+            'r', encoding='utf-8') as fil:
+        create = fil.read().split('\n\n')
     conn = sqlite3.Connection(dbname)
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;')

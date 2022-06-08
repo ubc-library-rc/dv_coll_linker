@@ -58,7 +58,8 @@ CONFIG = {
     'packages': ['dv_coll_linker'],
     'name': 'dv_coll_linker',
     'entry_points':  {'console_scripts': ['dv_coll_linker=dv_coll_linker.app:main',
-                                          'testme=dv_coll_linker.app:testme']}
+                                          'testme=dv_coll_linker.app:testme']},
+    'package_data': {'dv_coll_linker': ['data/create_tables.sql']}
 }
 
 setup(**CONFIG)
