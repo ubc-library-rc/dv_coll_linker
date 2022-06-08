@@ -91,7 +91,7 @@ def argument_parser() -> argparse.ArgumentParser:
                         default='dvnapp')
     parser.add_argument('-w', '--password',
                         help=('PostgreSQL database password for --user.'
-                              'Defaults to 123456. No, of course it doesn\'t'
+                              'Defaults to 123456. No, of course it doesn\'t. '
                               'There is no default password.'),
                         default=None)
     parser.add_argument('-p', '--port',
@@ -99,7 +99,7 @@ def argument_parser() -> argparse.ArgumentParser:
                         type=int,
                         default=5432)
     parser.add_argument('-r', '--dbhost',
-                        help=('Database host. Defaults to localhost. If using another host'
+                        help=('Database host. Defaults to localhost. If using another host '
                               'use *just* the hostname.'),
                         default='localhost')
     parser.add_argument('-k', '--key',
