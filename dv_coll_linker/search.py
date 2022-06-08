@@ -30,6 +30,7 @@ def get_total_records(baseurl:str = 'https://abacus.library.ubc.ca') -> int:
     #just getting count, minimum is 1, which is the fastest
     req = requests.get(f'{baseurl}/api/search?q=*&type=dataset&per_page=1')
     req.raise_for_status()
+    LOGGER.info('%s total records found', req.json()['data']['total_count'])
     return req.json()['data']['total_count']
 
 def get_all_recs(baseurl : str='https://abacus.library.ubc.ca',

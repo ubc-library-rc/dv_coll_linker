@@ -135,10 +135,10 @@ def add_single_study(conn:sqlite3.Connection, **kwargs) -> None:
                    (values[0],))
     out = cursor.fetchone()
     if out and out[1] == values[4]:#record exists
-        LOGGER.info('Existing study record')
+        LOGGER.debug('Existing study record: %s', values[0])
         return
     if out and out[1] != values[4]:#record updated
-        LOGGER.info('Updated study record')
+        LOGGER.debug('Updated study record: %s', values[0])
         cursor.execute(('UPDATE studies SET pid=?, dv_alias=?, title=?, '
                         'created_time=?, updated_time=? WHERE pid=?;'),
                         list(values) + [values[0]])
@@ -209,6 +209,7 @@ def check_unlink(conn:sqlite3.Connection)-> tuple:
     diff = checkme - children
     LOGGER.debug('children: %s',children)
     LOGGER.debug('Current links: %s', checkme)
+    LOGGER.debug('Diff:%s', diff)
     pids = []
     for coll in diff:
         cursor.execute('SELECT * FROM links WHERE parent=? AND child=?', coll)
@@ -238,11 +239,22 @@ def get_last_count(conn:sqlite3.Connection) -> (str, int):
     Returns the last count of studies in a Dataverse installation
     '''
     cursor = conn.cursor()
-    cursor.execute('select last_check, last_count FROM status ORDER BY last_check DESC LIMIT 1')
+    cursor.execute('SELECT last_check, last_count FROM status ORDER BY last_check DESC LIMIT 1')
     last_count = cursor.fetchone()
     if not last_count:
         return None, 0
     return last_count
+
+def get_search_data(conn:sqlite3.Connection)->dict:
+    '''
+    Retrieves last harvested search results
+    '''
+    cursor=conn.cursor()
+    cursor.execute('SELECT * FROM raw_data ORDER BY last_check DESC LIMIT 1')
+    outdata = cursor.fetchone()
+    if outdata:
+        return json.loads(outdata[1])
+    return None
 
 def write_search_data(conn:sqlite3.Connection, last_check:str, search_json:dict)->None:
     '''

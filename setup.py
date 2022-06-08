@@ -57,7 +57,8 @@ CONFIG = {
     'install_requires': REQUIRES,
     'packages': ['dv_coll_linker'],
     'name': 'dv_coll_linker',
-    'entry_points':  {'console_scripts': ['testme=dv_coll_linker.app:testme']}
+    'entry_points':  {'console_scripts': ['dv_coll_linker=dv_coll_linker.app:main',
+                                          'testme=dv_coll_linker.app:testme']}
 }
 
 setup(**CONFIG)
