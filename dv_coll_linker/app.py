@@ -59,7 +59,7 @@ from dv_coll_linker import search
 #I like this formatting better
 FORMATTER = logging.Formatter(('{asctime} - {levelname} - {name} - '
                                '{funcName} - {message}'), style='{')
-LEVEL = logging.DEBUG
+LEVEL = logging.INFO
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 DEFAULTDATE = '0001-01-01T00:00:00Z' #publishing predating this is unlikely
 
@@ -164,8 +164,8 @@ def main():
     args = argument_parser().parse_args()
     os.makedirs(os.path.split(os.path.expanduser(args.dbname))[0], exist_ok=True)
     os.makedirs(os.path.expanduser(args.log), exist_ok=True)
-    mainlog = rotating_logger(args.log, logging.WARNING)
-    #mainlog = console_logger(logging.INFO)
+    mainlog = rotating_logger(args.log, LEVEL)
+    #mainlog = console_logger(LEVEL)
 
     #create database if if doesn't exist
     conn = monitor.init(os.path.expanduser(args.dbname))
@@ -177,7 +177,8 @@ def main():
 
     #Populate with data if running on server, otherwise nothing
     collections, children = monitor.get_pg_data(args.dvdbname, args.user,
-                                                args.password, args.port)
+                                                args.password, args.dbhost,
+                                                args.port)
     if collections:
         monitor.populate_db(conn, collections, children)
 
@@ -186,6 +187,7 @@ def main():
 
     #Get last count
     date, count = monitor.get_last_count(conn)
+    mainlog.info('Last count: %s', count)
     if not date:
         date = DEFAULTDATE
 

@@ -11,16 +11,16 @@ TIMEFMT ='%Y-%m-%dT%H:%M:%SZ'
 
 LOGGER = logging.getLogger(__name__)
 
-LOGGER.setLevel(logging.DEBUG)
-#FORMATTER = logging.Formatter(('%(asctime)s - %(levelname)s - %(name)s - '
-#                               '%(funcName)s - %(message)s'))
-
-FORMATTER = logging.Formatter(('{asctime} - {levelname} - {name} - '
-                               '{funcName} - {message}'), style='{')
-
-CONSOLE_OUT = logging.StreamHandler()
-CONSOLE_OUT.setFormatter(FORMATTER)
-LOGGER.addHandler(CONSOLE_OUT)
+#LOGGER.setLevel(logging.DEBUG)
+##FORMATTER = logging.Formatter(('%(asctime)s - %(levelname)s - %(name)s - '
+##                               '%(funcName)s - %(message)s'))
+#
+#FORMATTER = logging.Formatter(('{asctime} - {levelname} - {name} - '
+#                               '{funcName} - {message}'), style='{')
+#
+#CONSOLE_OUT = logging.StreamHandler()
+#CONSOLE_OUT.setFormatter(FORMATTER)
+#LOGGER.addHandler(CONSOLE_OUT)
 
 def get_total_records(baseurl:str = 'https://abacus.library.ubc.ca') -> int:
     '''

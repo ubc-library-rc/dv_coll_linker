@@ -9,7 +9,8 @@ parent_alias TEXT,
 child_id INTEGER,
 child_alias TEXT,
 FOREIGN KEY (parent_alias) REFERENCES collections(alias),
-FOREIGN KEY (child_alias) REFERENCES collections(alias));
+FOREIGN KEY (child_alias) REFERENCES collections(alias),
+UNIQUE (parent_id, parent_alias, child_id, child_alias));
 
 CREATE TABLE IF NOT EXISTS studies
 ( pid TEXT PRIMARY KEY,

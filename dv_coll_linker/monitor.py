@@ -52,12 +52,15 @@ def init(dbname:str) -> sqlite3.Connection:
                                               'data/create_tables.sql'),
             'r', encoding='utf-8') as fil:
         create = fil.read().split('\n\n')
+        LOGGER.info('Read database initialization SQL')
+        LOGGER.info('%s', create)
     conn = sqlite3.Connection(dbname)
     cursor = conn.cursor()
     cursor.execute('PRAGMA foreign_keys=ON;')
     for table in create:
         cursor.execute(table)
         conn.commit()
+    LOGGER.info('Initialized database')
     return conn
 
 def get_pg_data(dbname:str, user:str, password:str,
@@ -67,7 +70,8 @@ def get_pg_data(dbname:str, user:str, password:str,
     to populate the collections and children tables
     '''
     #pconn=psycopg2.connect(dbname='dvndb', user='dvnapp', password='')
-    if not NOPG:
+    if NOPG:
+        LOGGER.warning('Did not connect to PostgreSQL database; no psycopg2')
         return None, None
 
     try:
@@ -86,10 +90,14 @@ def get_pg_data(dbname:str, user:str, password:str,
                          'ON parent.id = dl.linkingdataverse_id ORDER BY parent_id;'))
         children = pcursor.fetchall()
         pconn.close()
+        LOGGER.info('Successfully parsed PostgreSQL database')
         return collections, children
 
     except psycopg2.OperationalError:
         LOGGER.exception('Postgres Error')
+        LOGGER.critical(('Params – dbname: %s, user: %s, password: %s, '
+                         'host:%s, port: %s'), dbname, user, '[redacted]',
+                         host, port)
         return None, None
 
 def populate_db(conn:sqlite3.Connection,
@@ -205,7 +213,6 @@ def add_link(conn:sqlite3.Connection, pid:str, parent: str, child: str) -> None:
     desc
     '''
     cursor = conn.cursor()
-    print(pid, parent, child)
     cursor.execute('INSERT INTO links VALUES(?, ?, ?);',
                    (pid, parent, child))
     conn.commit()

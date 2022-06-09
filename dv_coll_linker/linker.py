@@ -30,10 +30,14 @@ def create_link(pid:str, parent:str, url:str, key:str, timeout:int=100) -> bool:
                              headers={'X-Dataverse-key': key},
                              params={'persistentId':pid},
                              timeout=timeout)
-        linky.raise_for_status()
         if linky.json().get('status') == 'ERROR':
+            if linky.json().get('message') == ('Can\'t link a dataset that has '
+                                               'already been linked to this dataverse'):
+                LOGGER.warning('PID %s already linked to %s', pid, parent)
+                return True
             LOGGER.warning(linky.json().get('message'))
             return False
+        linky.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.JSONDecodeError):
         LOGGER.exception('Requests Error')
         return False
@@ -60,10 +64,15 @@ def unlink(pid:str, parent:str, url:str, key:str, timeout:int=100) -> bool:
                                   headers={'X-Dataverse-key': key},
                                   params={'persistentId':pid},
                                   timeout=timeout)
-        unlinky.raise_for_status()
         if unlinky.json().get('status') == 'ERROR':
+            if (unlinky.json().get('message').startswith('Dataset linking') and
+                unlinky.json().get('message').endswith('not found.')):
+                LOGGER.warning('PID %s appears to be unlinked already', pid)
+                LOGGER.warning('%s', unlinky.json())
+                return True
             LOGGER.warning(unlinky.json().get('message'))
             return False
+        unlinky.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.JSONDecodeError):
         LOGGER.exception(('Requests Error. 404 errors (usually) indicate '
             '              that the link did not exist in the first place.'))
