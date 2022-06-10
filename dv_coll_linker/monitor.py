@@ -198,12 +198,23 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
         LOGGER.info('Records purged from *links*: %s', diff)
     conn.commit()
 
-def check_link(conn:sqlite3.Connection, pid:str) -> bool:
+def check_link_old(conn:sqlite3.Connection, pid:str) -> bool:
     '''
     Check for existence of link. Returns True if link exists, else False:
     '''
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM links WHERE pid=?;', (pid,))
+    if cursor.fetchone():
+        return True
+    return False
+
+def check_link(conn:sqlite3.Connection, pid:str, parent:str, child:str) -> bool:
+    '''
+    Check for existence of link. Returns True if link exists, else False:
+    '''
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM links WHERE pid=? AND parent=? AND child=?;',
+                   (pid, parent, child))
     if cursor.fetchone():
         return True
     return False

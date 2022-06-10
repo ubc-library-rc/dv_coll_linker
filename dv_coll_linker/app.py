@@ -230,7 +230,8 @@ def main():
         #for item in new:
         for item in [x for x in allrecs['data']['items'] if
                      x['identifier_of_dataverse'] == branch[1]
-                     and not monitor.check_link(conn, x['global_id'])]:
+                     and not monitor.check_link(conn, x['global_id'],
+                                                branch[0], branch[1])]:
 
             mainlog.debug('%s\t%s\t%s\t%s',
                          item['global_id'], branch[0],
