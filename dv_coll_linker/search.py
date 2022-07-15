@@ -78,7 +78,7 @@ def get_new_recs(allrecs:dict, last_check=str) -> list:
     automatically encoded to 2022-01-01T00:00:00Z.
 
     last_check is a time string in '%Y-%m-%dT%H:%M:%SZ', or portions thereof. When including the
-    time, make sure to use T.
+    time, make sure to use/include T.
     '''
     time_string = '0000-01-01T00:00:00Z'
     if len(last_check) < 4:
