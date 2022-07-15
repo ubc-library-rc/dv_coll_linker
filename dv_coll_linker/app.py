@@ -250,32 +250,5 @@ def main():
     conn.commit()
     conn.close()
 
-def testme():
-    '''
-    This is just a test to see if the hook worked
-    '''
-    parser = argument_parser()
-    args = parser.parse_args()
-    print(args.dbname)
-    print('I have been sorely tested')
-    logger = console_logger(logging.DEBUG)
-    #logger = rotating_logger('/Users/paul/tmp/testme.log', logging.DEBUG)
-    #logger.debug('DEBUG')
-    #logger.info('INFO')
-    #logger.warning('WARNING')
-    #logger.error('ERROR')
-    #logger.critical('CRITICAL')
-    #logger.info('Not printing exception')
-    logger.info('here is a representation of set length %s',len({1,3,9}))
-    logger.info('view set: %s',{1,32,389,32})
-    logger.info('multiple values %s, %s', 'paul', {2,3,798})
-    #import sqlite3
-    #conn = sqlite3.Connection(('/Users/paul/Documents/Work'
-    #                           '/Projects/dv_coll_linker/tmp/testme_del.db'))
-    #for gone in monitor.check_unlink(conn):
-    #    if linker.unlink(gone[0], gone[1], args.url, args.key):
-    #        monitor.remove_link(conn, *gone)
-    #logger.info(monitor.check_unlink(conn))
-
 if __name__ == '__main__':
     main()
