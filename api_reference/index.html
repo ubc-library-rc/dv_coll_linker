@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>API Reference - Dataverse Collection Linker</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "API Reference";
+    var mkdocs_page_input_path = "api_reference.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dataverse Collection Linker</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../install/">Installation</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../usage/">Command Line Usage</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">API Reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linker">dv_coll_linker</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linkermonitor">dv_coll_linker.monitor</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#init">init</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_pg_data">get_pg_data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#populate_db">populate_db</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fetch_parent_child_collections">fetch_parent_child_collections</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add_single_study">add_single_study</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#purge_nonexistent">purge_nonexistent</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check_link_old">check_link_old</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check_link">check_link</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add_link">add_link</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check_unlink">check_unlink</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#remove_link">remove_link</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write_status">write_status</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_last_count">get_last_count</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_search_data">get_search_data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write_search_data">write_search_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linkerlinker">dv_coll_linker.linker</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#create_link">create_link</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#unlink">unlink</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linkerapp">dv_coll_linker.app</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#argument_parser">argument_parser</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#console_logger">console_logger</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rotating_logger">rotating_logger</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main">main</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#testme">testme</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linkersearch">dv_coll_linker.search</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get_total_records">get_total_records</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_all_recs">get_all_recs</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_new_recs">get_new_recs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dv_coll_linkerdata">dv_coll_linker.data</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Dataverse Collection Linker</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>API Reference</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a name="dv_coll_linker"></a></p>
+<h1 id="complete-api-reference">Complete API Reference<a class="headerlink" href="#complete-api-reference" title="Permanent link">&para;</a></h1>
+<h2 id="dv_coll_linker">dv_coll_linker<a class="headerlink" href="#dv_coll_linker" title="Permanent link">&para;</a></h2>
+<p>Dataverse collection linker for Dataverse 5.6+ to emulate the
+functionality of the collection linking in which functioned
+correctly in Dataverse 4.20</p>
+<p>In essence, this software can create individual item links
+where collection links were. That is, for a collection containing
+10 files, this product will create individual links to the
+10 files instead of just using the (non-functioning) link
+to the collection.</p>
+<p>search: institutes date level searching via Dataverse&rsquo;s
+search API</p>
+<p>linker: Python implementation of linking and unlinking
+data sets</p>
+<p>monitor: SQLite monitor of collection level linking.</p>
+<p>app: Implementation of a standalone application which can
+run at intervals to emulate the collection linking feature.</p>
+<p>If run on the server hosting a Dataverse instance, it can
+read the collection level linking from the <code>datverselinkingdataverse</code>
+table if supplied the proper credentials for the PostreSQL database
+underlying Dataverse.</p>
+<p>If connections fail or the product is run on a platform with no
+access to the PostgreSQL database, the product will still function
+but the underlying SQLite database holding dataverse and link information
+will need to be populated manually. That is, the tables
+<code>collections</code> and <code>children</code> will need to be manually populated.</p>
+<p>Similarly, if changes are made to the collection structure, such
+as an unlinked collection, if the PostgreSQL database cannot be read then
+the changes must be added to the SQLite database manually.</p>
+<p><a name="dv_coll_linker.monitor"></a></p>
+<h2 id="dv_coll_linkermonitor">dv_coll_linker.monitor<a class="headerlink" href="#dv_coll_linkermonitor" title="Permanent link">&para;</a></h2>
+<p>Database creation for study level links in a Dataverse installation.</p>
+<p>Required because collection level links were apparently broken in v5.? +</p>
+<p>This module creates the database and, if running on the server with a Dataverse
+installation, can automatically add any detected linked collections for use with the
+linker and search modules.</p>
+<p>This module basically acts as a singleton object on import.</p>
+<p><a name="dv_coll_linker.monitor.init"></a></p>
+<h5 id="init">init<a class="headerlink" href="#init" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">init(dbname: str) -&gt; sqlite3.Connection</code></pre>
+
+
+<p>Intialize database with {dbname}.</p>
+<p><a name="dv_coll_linker.monitor.get_pg_data"></a></p>
+<h5 id="get_pg_data">get_pg_data<a class="headerlink" href="#get_pg_data" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_pg_data(dbname: str, user: str, password: str, host: str = 'localhost', port: int = 5432) -&gt; (list, list)</code></pre>
+
+
+<p>Grabs linking data from postgres database. Returns two lists used
+to populate the collections and children tables</p>
+<p><a name="dv_coll_linker.monitor.populate_db"></a></p>
+<h5 id="populate_db">populate_db<a class="headerlink" href="#populate_db" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">populate_db(conn: sqlite3.Connection, collections: list, children: list) -&gt; bool</code></pre>
+
+
+<p>Updates the database with linking dataverse info</p>
+<p><a name="dv_coll_linker.monitor.fetch_parent_child_collections"></a></p>
+<h5 id="fetch_parent_child_collections">fetch_parent_child_collections<a class="headerlink" href="#fetch_parent_child_collections" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">fetch_parent_child_collections(conn: sqlite3.Connection) -&gt; list</code></pre>
+
+
+<p>Returns a list of (parent, child) collection pairs</p>
+<p><a name="dv_coll_linker.monitor.add_single_study"></a></p>
+<h5 id="add_single_study">add_single_study<a class="headerlink" href="#add_single_study" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">add_single_study(conn: sqlite3.Connection, **kwargs) -&gt; None</code></pre>
+
+
+<p>Writes metadata from a single study to the database. Supply the
+JSON from the record as keyword arguments.</p>
+<p><a name="dv_coll_linker.monitor.purge_nonexistent"></a></p>
+<h5 id="purge_nonexistent">purge_nonexistent<a class="headerlink" href="#purge_nonexistent" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">purge_nonexistent(conn: sqlite3.Connection, allrecs: dict) -&gt; None</code></pre>
+
+
+<p>Removes PIDS that don&rsquo;t appear in allrecs[&lsquo;data&rsquo;][&lsquo;items&rsquo;]</p>
+<p><a name="dv_coll_linker.monitor.check_link_old"></a></p>
+<h5 id="check_link_old">check_link_old<a class="headerlink" href="#check_link_old" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">check_link_old(conn: sqlite3.Connection, pid: str) -&gt; bool</code></pre>
+
+
+<p>Check for existence of link. Returns True if link exists, else False:</p>
+<p><a name="dv_coll_linker.monitor.check_link"></a></p>
+<h5 id="check_link">check_link<a class="headerlink" href="#check_link" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">check_link(conn: sqlite3.Connection, pid: str, parent: str, child: str) -&gt; bool</code></pre>
+
+
+<p>Check for existence of link. Returns True if link exists, else False:</p>
+<p><a name="dv_coll_linker.monitor.add_link"></a></p>
+<h5 id="add_link">add_link<a class="headerlink" href="#add_link" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">add_link(conn: sqlite3.Connection, pid: str, parent: str, child: str) -&gt; None</code></pre>
+
+
+<p>desc</p>
+<p><a name="dv_coll_linker.monitor.check_unlink"></a></p>
+<h5 id="check_unlink">check_unlink<a class="headerlink" href="#check_unlink" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">check_unlink(conn: sqlite3.Connection) -&gt; tuple</code></pre>
+
+
+<p>Returns persistent IDs where a link exists but a parent/child relationship
+does not. That is, it detects the items in a collection that has been unlinked
+from a parent</p>
+<p><a name="dv_coll_linker.monitor.remove_link"></a></p>
+<h5 id="remove_link">remove_link<a class="headerlink" href="#remove_link" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">remove_link(conn: sqlite3.Connection, pid: str, parent: str, child: str) -&gt; None</code></pre>
+
+
+<p>desc</p>
+<p><a name="dv_coll_linker.monitor.write_status"></a></p>
+<h5 id="write_status">write_status<a class="headerlink" href="#write_status" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">write_status(conn: sqlite3.Connection, last_check: str, last_count: int) -&gt; None</code></pre>
+
+
+<p>Writes timestamp and total file count to database</p>
+<p><a name="dv_coll_linker.monitor.get_last_count"></a></p>
+<h5 id="get_last_count">get_last_count<a class="headerlink" href="#get_last_count" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_last_count(conn: sqlite3.Connection) -&gt; (str, int)</code></pre>
+
+
+<p>Returns the last count of studies in a Dataverse installation</p>
+<p><a name="dv_coll_linker.monitor.get_search_data"></a></p>
+<h5 id="get_search_data">get_search_data<a class="headerlink" href="#get_search_data" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_search_data(conn: sqlite3.Connection) -&gt; dict</code></pre>
+
+
+<p>Retrieves last harvested search results</p>
+<p><a name="dv_coll_linker.monitor.write_search_data"></a></p>
+<h5 id="write_search_data">write_search_data<a class="headerlink" href="#write_search_data" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">write_search_data(conn: sqlite3.Connection, last_check: str, search_json: dict) -&gt; None</code></pre>
+
+
+<p>Writes the current study search JSON to the database</p>
+<p><a name="dv_coll_linker.linker"></a></p>
+<h2 id="dv_coll_linkerlinker">dv_coll_linker.linker<a class="headerlink" href="#dv_coll_linkerlinker" title="Permanent link">&para;</a></h2>
+<p>Implementation of Dataverse study linking as Python functions.</p>
+<p>Nothing fancy, but it does add log messages on failures.</p>
+<p><a name="dv_coll_linker.linker.create_link"></a></p>
+<h5 id="create_link">create_link<a class="headerlink" href="#create_link" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">create_link(pid: str, parent: str, url: str, key: str, timeout: int = 100) -&gt; bool</code></pre>
+
+
+<p>Create a dataverse link of pid to collection parent.
+Returns true on successful (new) link.</p>
+<p>pid: str
+Dataverse persistent ID (handle or DOI)
+parent: str
+Parent (target) collection short name
+url: str
+Base url to Dataverse installation
+key: str
+API key for Dataverse installation. Note: linking requires superuser privileges.
+timeout: int
+Timeout in seconds</p>
+<p><a name="dv_coll_linker.linker.unlink"></a></p>
+<h5 id="unlink">unlink<a class="headerlink" href="#unlink" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">unlink(pid: str, parent: str, url: str, key: str, timeout: int = 100) -&gt; bool</code></pre>
+
+
+<p>Removes a Dataverse link of pid to collection parent.
+Returns true on successful removal.
+pid: str
+Dataverse persistent ID (handle or DOI)
+parent: str
+Parent (target) collection short name
+url: str
+Base url to Dataverse installation
+key: str
+API key for Dataverse installation. Note: linking requires superuser privileges.
+timeout: int
+Timeout in seconds</p>
+<p><a name="dv_coll_linker.app"></a></p>
+<h2 id="dv_coll_linkerapp">dv_coll_linker.app<a class="headerlink" href="#dv_coll_linkerapp" title="Permanent link">&para;</a></h2>
+<p>Collection level linker for Dataverse data repository software.</p>
+<p>As the current (June 2022) version of <a href="https://dataverse.org">Dataverse</a> v5.10
+has a bug which has apparently disabled collection level linking.
+For more information on this bug, please see the Dataverse User&rsquo;s Community
+Google group at:
+<a href="https://groups.google.com/g/dataverse-community/c/DDmVelt3Zfk">https://groups.google.com/g/dataverse-community/c/DDmVelt3Zfk</a>:</p>
+<p>This part of the dv_coll_linker package will automate <em>per-study</em> linking for
+collections which are listed as being linked, restoring the functionality found
+in Dataverse v4+.</p>
+<p>This involves <em>no</em> changes to the underlying code. Links are tracked in a
+user specified SQLite database, and linking is performed via the Dataverse API.</p>
+<p>There are several caveats to this software:</p>
+<ol>
+<li>Link tables can only be populated automatically if the software has
+access to the Dataverse PostgreSQL database which usually means that the
+software will run on the server which hosts the database. This is not techincally
+required, though, and if the collection and children tables are populated manually,
+either by importing a PostgreSQL dump or by entering them labouriously by hand,
+the software will function.</li>
+</ol>
+<p>This means, however, that new collection links will not be discovered automatically
+ and will need to be added by hand or by reimporting the tables.</p>
+<ol>
+<li>
+<p>The software requires superuser Dataverse API keys, as linking is a superuser
+function. It&rsquo;s theoretically possible that a superuser does not have direct server
+access, so if that is the case, please re-read number 1 and speak to the administrator
+of the Datavese server to obtain the initial data with which to populate your
+salite database.</p>
+</li>
+<li>
+<p>The software can be run repeatedly to include new links or remove old ones (although
+old links should automatically be removed if a study is deleted anyway, as it should
+be purged from the PostgreSQL database. The easiest way to do this is to schedule it
+to run at regular intervals, such as by using crontab or the windows scheduler.</p>
+</li>
+</ol>
+<p>There are other ways to daemonize, but this is supposed to be a stopgap and not a
+ permanent solution, so they have not been implemented.</p>
+<ol>
+<li>Unlinking code is commented out in the code below. See also linker.unlink.</li>
+</ol>
+<p><a name="dv_coll_linker.app.argument_parser"></a></p>
+<h5 id="argument_parser">argument_parser<a class="headerlink" href="#argument_parser" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">argument_parser() -&gt; argparse.ArgumentParser</code></pre>
+
+
+<p>Argument parser for command line script.</p>
+<p><a name="dv_coll_linker.app.console_logger"></a></p>
+<h5 id="console_logger">console_logger<a class="headerlink" href="#console_logger" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">console_logger(level: int) -&gt; logging.getLogger</code></pre>
+
+
+<p>Logging to console only.</p>
+<p><a name="dv_coll_linker.app.rotating_logger"></a></p>
+<h5 id="rotating_logger">rotating_logger<a class="headerlink" href="#rotating_logger" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">rotating_logger(path: str, level: int, fname='dv_coll_linker.log') -&gt; logging.getLogger</code></pre>
+
+
+<p>Rotating log called called logname, where logname is the full
+path (ie, /path/to/</p>
+<p><a name="dv_coll_linker.app.main"></a></p>
+<h5 id="main">main<a class="headerlink" href="#main" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">main()</code></pre>
+
+
+<p>Primary</p>
+<p><a name="dv_coll_linker.app.testme"></a></p>
+<h5 id="testme">testme<a class="headerlink" href="#testme" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">testme()</code></pre>
+
+
+<p>This is just a test to see if the hook worked</p>
+<p><a name="dv_coll_linker.search"></a></p>
+<h2 id="dv_coll_linkersearch">dv_coll_linker.search<a class="headerlink" href="#dv_coll_linkersearch" title="Permanent link">&para;</a></h2>
+<p>A theoretical date search for Dataverse installations.
+Inelegant.</p>
+<p><a name="dv_coll_linker.search.get_total_records"></a></p>
+<h5 id="get_total_records">get_total_records<a class="headerlink" href="#get_total_records" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_total_records(baseurl: str = 'https://abacus.library.ubc.ca') -&gt; int</code></pre>
+
+
+<p>Returns the total number of datasets in the root collection of a
+Dataverse installation (ie, total number of data sets)</p>
+<p><a name="dv_coll_linker.search.get_all_recs"></a></p>
+<h5 id="get_all_recs">get_all_recs<a class="headerlink" href="#get_all_recs" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_all_recs(baseurl: str = 'https://abacus.library.ubc.ca', per_page: int = 100, timeout: int = 100) -&gt; dict</code></pre>
+
+
+<p>Returns a single, non-paginated json from the Dataverse search API
+including all datasets (only).</p>
+<p>baseurl : str
+    Base url of Dataverse installation
+per_page : int
+    Number of results per page
+timeout  : int
+    Request timeout in second</p>
+<p><a name="dv_coll_linker.search.get_new_recs"></a></p>
+<h5 id="get_new_recs">get_new_recs<a class="headerlink" href="#get_new_recs" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">get_new_recs(allrecs: dict, last_check=str) -&gt; list</code></pre>
+
+
+<p>Returns a list of records (ie, individual items from allrecs[&lsquo;data&rsquo;][&lsquo;items&rsquo;]
+that are newer than last_check. Note that &ldquo;newer&rdquo; in this case is to the second,
+so searching for &ldquo;2022&rdquo; will pull up all records for 2022, as 2022 will be
+automatically encoded to 2022-01-01T00:00:00Z.</p>
+<p>last_check is a time string in &lsquo;%Y-%m-%dT%H:%M:%SZ&rsquo;, or portions thereof. When including the
+time, make sure to use/include T.</p>
+<p><a name="dv_coll_linker.data"></a></p>
+<h2 id="dv_coll_linkerdata">dv_coll_linker.data<a class="headerlink" href="#dv_coll_linkerdata" title="Permanent link">&para;</a></h2>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../faq/" class="btn btn-neutral float-right" title="FAQ">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../usage/" class="btn btn-neutral" title="Command Line Usage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../usage/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../faq/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

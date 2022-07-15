@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Command Line Usage - Dataverse Collection Linker</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Command Line Usage";
+    var mkdocs_page_input_path = "usage.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Dataverse Collection Linker</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../install/">Installation</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Command Line Usage</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#using-the-command-line-tool">Using the command line tool:</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dv_coll_linker">dv_coll_linker</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#continual-updating">Continual updating</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Dataverse Collection Linker</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Command Line Usage</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="command-line-usage">Command Line Usage<a class="headerlink" href="#command-line-usage" title="Permanent link">&para;</a></h1>
+<p>Unless the Dataverse installation has an unusual use case or setup, most users will just need to run the included command line utilty, called, unsurprisingly, <code>dv_coll_linker</code>.</p>
+<p><strong>Notes on running the software outside the Dataverse server environment</strong></p>
+<p>While it is <em>technically</em> not required to run the collection linker from the server which hosts a Dataverse installation, it may be desirable to do so. If the user running the program has sufficient privileges, if run on the server the <code>dv_coll_linker</code> utility will automatically detect linked collections and populate the resultant <a href="https://sqlite.org">sqlite3</a> database with the appropriate data, allowing the software to run more-or-less automatically.</p>
+<p>If the database is <em>not</em> automatically populated, the <code>children</code> table in the tracking database must be populated manually. It&rsquo;s quite straightforward:</p>
+<ul>
+<li>parent_id: Database id number of parent</li>
+<li>parent_alias: Dataverse short name for collection</li>
+<li>child_id: Database id number of child (ie, the collection which is linked to the parent)</li>
+<li>child_alias: Dataverse short name for the child collection.</li>
+</ul>
+<p>For those not comfortable using sqlite3 from the command line, there is a very nice free and open source piece of software with a well-designed UI: <a href="https://sqlitebrowser.org">DB Browser for SQLite</a>.</p>
+<p>It may be possible to have the utility automatically populate the tables if you have the PostgreSQL port open to outside, but that seems unlikely and inadvisable.</p>
+<h2 id="using-the-command-line-tool">Using the command line tool:<a class="headerlink" href="#using-the-command-line-tool" title="Permanent link">&para;</a></h2>
+<p>To use the tool on the server and automatically harvest data from PostgreSQL, you will need:</p>
+<ul>
+<li>The Dataverse installation&rsquo;s PostgreSQL database name</li>
+<li>The password to access the database</li>
+<li>The port for accessing the database</li>
+<li>A superuser API key</li>
+</ul>
+<p><strong>Superuser keys are required because links may only be produced by superusers.</strong> Some defaults are already in place as listed below.</p>
+<h3 id="dv_coll_linker">dv_coll_linker<a class="headerlink" href="#dv_coll_linker" title="Permanent link">&para;</a></h3>
+<pre class="codehilite"><code class="language-nohighlight">usage: dv_coll_linker [-h] [-u URL] [-d DVDBNAME] [-y USER] [-w PASSWORD] [-p PORT] [-r DBHOST] [-k KEY] [-b DBNAME] [-l LOG] [-v--version]
+
+Study level linker for Dataverse installations. Finds collection level links and automatically adds study-level links for each found collection. Addresses issues as noted here
+https://groups.google.com/g/dataverse-community/c/DDmVelt3Zfk
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     URL to base Dataverse installation. Default https://abacus.library.ubc.ca
+  -d DVDBNAME, --dvdbname DVDBNAME
+                        Dataverse PostgreSQL Database name. Defaults to dvndb. If not run on the server hosting a Dataverse installation, the program will attempt to connect to
+                        PostgreSQL. It will likely fail if your security is good and you will need to populate the collection and children database manually.
+  -y USER, --user USER  PostgreSQL database username. Defaults to dvnapp
+  -w PASSWORD, --password PASSWORD
+                        PostgreSQL database password for --user.Defaults to 123456. No, of course it doesn't. There is no default password.
+  -p PORT, --port PORT  PostgreSQL port. Defaults to 5432
+  -r DBHOST, --dbhost DBHOST
+                        Database host. Defaults to localhost. If using another host use *just* the hostname.
+  -k KEY, --key KEY     Dataverse installation API key. This *must* be a superuser API key. Non-superuser keys will fail. If you don't know if you have superuser keys, you are probably
+                        not a superuser.
+  -b DBNAME, --dbname DBNAME
+                        Local sqlite3 link database. Defaults to ~/dv_links.sqlite3
+  -l LOG, --log LOG     Log directory. Defaults to ~/logs. Log is saved as dv_coll_linker.log
+  -v--version           Show version number and exit</code></pre>
+
+
+<h2 id="continual-updating">Continual updating<a class="headerlink" href="#continual-updating" title="Permanent link">&para;</a></h2>
+<p>There are a few options for ensuring automatic updates to your dataverse installation.</p>
+<ul>
+<li>
+<p>Run at intervals with <code>cron</code></p>
+<ul>
+<li>This is probably advisable with large or multi-user Dataverse installations. As the utility only obtains new or changed studies, it does not place excessive server load and can be run at fairly frequent intervals, such as 10 minutes. Note that the <em>first</em> time the software runs, the whole Dataverse installation will be crawled for metadata, so if server load is an issue, you should be aware of this</li>
+</ul>
+</li>
+<li>
+<p>Manually running</p>
+<ul>
+<li>For smaller installations or those with few linked collections, it may be easier to just run the utility on an <em>ad_hoc</em> basis.</li>
+</ul>
+</li>
+<li>
+<p>Windows scheduler</p>
+<ul>
+<li>If, for some reason, you are not running the software on the server and are using a Windows computer, you can use the Windows Task Scheduler to run the application at your desired interval.</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api_reference/" class="btn btn-neutral float-right" title="API Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../install/" class="btn btn-neutral" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../install/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../api_reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
