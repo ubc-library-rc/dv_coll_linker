@@ -29,7 +29,8 @@ def get_version(version_tuple):
     return '.'.join(map(str, version_tuple))
 
 PKG_VERSION = get_version(ast.literal_eval(version_line.split('=')[-1].strip()))
-REQUIRES = [req.strip().replace('==',' >= ') for req in
+#REQUIRES = [req.strip().replace('==',' >= ') for req in
+REQUIRES = [req.strip().replace('==',' ~= ') for req in
             open('requirements.txt', encoding='utf-8').readlines()]
 
 CONFIG = {

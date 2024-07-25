@@ -6,3 +6,5 @@ tmp/**
 internal_docs
 **/__pycache__/**
 **/*.pyc
+build/
+build/**

@@ -187,6 +187,8 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
         return
     #remove the difference of sets
     diff = oldpids - newpids
+    if len(diff) == 1: #Otherwise executemany iterates over a string
+        diff = tuple(diff)
     LOGGER.debug('oldpids: %s', oldpids)
     LOGGER.debug('newpids: %s', newpids)
     LOGGER.warning('PIDs to purge: %s', diff)
