@@ -189,7 +189,7 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
     diff = oldpids - newpids
     LOGGER.debug('oldpids: %s', oldpids)
     LOGGER.debug('newpids: %s', newpids)
-    LOGGER.debug('PIDs to purge: %s', diff)
+    LOGGER.warning('PIDs to purge: %s', diff)
     if diff:
         LOGGER.info('Purging %s old records', len(diff))
         cursor.executemany('DELETE FROM studies WHERE pid=?;', diff)
