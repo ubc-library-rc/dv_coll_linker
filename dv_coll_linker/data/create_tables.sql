@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS links
 ( pid TEXT,
 parent TEXT,
 child TEXT,
-FOREIGN KEY (pid) REFERENCES studies(pid),
+FOREIGN KEY (pid) REFERENCES studies(pid) ON DELETE CASCADE,
 FOREIGN KEY (parent) REFERENCES collections(alias)
 FOREIGN KEY (child) REFERENCES collections(alias));
 

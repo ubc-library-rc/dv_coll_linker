@@ -35,5 +35,5 @@ Similarly, if changes are made to the collection structure, such
 as an unlinked collection, if the PostgreSQL database cannot be read then
 the changes must be added to the SQLite database manually.
 '''
-VERSION = (0, 3, 4)
+VERSION = (0, 4, 0)
 __version__ = '.'.join([str(x) for x in VERSION])

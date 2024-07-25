@@ -48,6 +48,7 @@ import datetime
 import logging
 import logging.handlers
 import os
+import traceback
 
 import dv_coll_linker
 from dv_coll_linker import linker
@@ -176,79 +177,84 @@ def main():
     #cursor.execute('DELETE FROM status')
 
     #Populate with data if running on server, otherwise nothing
-    collections, children = monitor.get_pg_data(args.dvdbname, args.user,
-                                                args.password, args.dbhost,
-                                                args.port)
-    if collections:
-        monitor.populate_db(conn, collections, children)
+    try:
+        collections, children = monitor.get_pg_data(args.dvdbname, args.user,
+                                                    args.password, args.dbhost,
+                                                    args.port)
+        if collections:
+            monitor.populate_db(conn, collections, children)
 
-    #get link relationships
-    family_tree = monitor.fetch_parent_child_collections(conn)
+        #get link relationships
+        family_tree = monitor.fetch_parent_child_collections(conn)
 
-    #Get last count
-    date, count = monitor.get_last_count(conn)
-    mainlog.info('Last count: %s', count)
-    if not date:
-        date = DEFAULTDATE
+        #Get last count
+        date, count = monitor.get_last_count(conn)
+        mainlog.info('Last count: %s', count)
+        if not date:
+            date = DEFAULTDATE
 
-    #Check to see if we need to update
-    newcount = search.get_total_records(args.url)
-    newdate = datetime.datetime.now().strftime(TIMEFMT)
-    mainlog.debug('count: %s,  newdate: %s, date: %s',
-                 count, newdate, date)
+        #Check to see if we need to update
+        newcount = search.get_total_records(args.url)
+        newdate = datetime.datetime.now().strftime(TIMEFMT)
+        mainlog.debug('count: %s,  newdate: %s, date: %s',
+                     count, newdate, date)
 
-    if newcount != count: #!= or >? I suppose it's possible that it can shrink
-        mainlog.info('Total number of new records: %s', newcount)
-        allrecs = search.get_all_recs(args.url)
-        #if we had to download, we should save the data set
-        #status has to come first because it has the primary key
-        monitor.write_status(conn, newdate, newcount)
-        monitor.write_search_data(conn, newdate, allrecs)
-        #Update the list of all studies in the Dataverse installation
-        for rec in allrecs['data']['items']:
-            monitor.add_single_study(conn, **rec)
-        #Strip nonexistent studies out just to keep things current
-    else:
-        allrecs = monitor.get_search_data(conn)
+        if newcount != count: #!= or >? I suppose it's possible that it can shrink
+            mainlog.info('Total number of new records: %s', newcount)
+            allrecs = search.get_all_recs(args.url)
+            #if we had to download, we should save the data set
+            #status has to come first because it has the primary key
+            monitor.write_status(conn, newdate, newcount)
+            monitor.write_search_data(conn, newdate, allrecs)
+            #Update the list of all studies in the Dataverse installation
+            for rec in allrecs['data']['items']:
+                monitor.add_single_study(conn, **rec)
+            #Strip nonexistent studies out just to keep things current
+        else:
+            allrecs = monitor.get_search_data(conn)
 
-    monitor.purge_nonexistent(conn, allrecs)
+        monitor.purge_nonexistent(conn, allrecs)
 
-    #And now the magic happens
-    for branch in family_tree:
-        #Checking by time example
-        #new = [x for x in allrecs['data']['items'] if
-        #      datetime.datetime.strptime(x['updatedAt'], TIMEFMT) >
-        #      datetime.datetime.strptime(date, TIMEFMT) and
-        #      x['identifier_of_dataverse'] == branch[1]]
-        #However . . .
-        #Checking by time doesn't work if collections are deleted
-        #Link must not currently exist
-        #new = [x for x in allrecs['data']['items'] if
-        #       x['identifier_of_dataverse'] == branch[1]
-        #       and not monitor.check_link(conn, x['global_id'])]
+        #And now the magic happens
+        for branch in family_tree:
+            #Checking by time example
+            #new = [x for x in allrecs['data']['items'] if
+            #      datetime.datetime.strptime(x['updatedAt'], TIMEFMT) >
+            #      datetime.datetime.strptime(date, TIMEFMT) and
+            #      x['identifier_of_dataverse'] == branch[1]]
+            #However . . .
+            #Checking by time doesn't work if collections are deleted
+            #Link must not currently exist
+            #new = [x for x in allrecs['data']['items'] if
+            #       x['identifier_of_dataverse'] == branch[1]
+            #       and not monitor.check_link(conn, x['global_id'])]
 
-        #for item in new:
-        for item in [x for x in allrecs['data']['items'] if
-                     x['identifier_of_dataverse'] == branch[1]
-                     and not monitor.check_link(conn, x['global_id'],
-                                                branch[0], branch[1])]:
+            #for item in new:
+            for item in [x for x in allrecs['data']['items'] if
+                         x['identifier_of_dataverse'] == branch[1]
+                         and not monitor.check_link(conn, x['global_id'],
+                                                    branch[0], branch[1])]:
 
-            mainlog.debug('%s\t%s\t%s\t%s',
-                         item['global_id'], branch[0],
-                         branch[1], item['identifier_of_dataverse'])
-            mainlog.info('Creating link %s to %s', item["global_id"], branch[0])
-            if linker.create_link(item['global_id'], branch[0], args.url, args.key):
-                monitor.add_link(conn, item['global_id'], branch[0], branch[1])
+                mainlog.debug('%s\t%s\t%s\t%s',
+                             item['global_id'], branch[0],
+                             branch[1], item['identifier_of_dataverse'])
+                mainlog.info('Creating link %s to %s', item["global_id"], branch[0])
+                if linker.create_link(item['global_id'], branch[0], args.url, args.key):
+                    monitor.add_link(conn, item['global_id'], branch[0], branch[1])
 
-    #Unlink and remove old links from deleted collections
-    for gone in monitor.check_unlink(conn):
-        #mainlog.info('Removing link for %s', gone)
-        if linker.unlink(gone[0], gone[1], args.url, args.key):
-            mainlog.info('Removed link for %s', gone)
-            monitor.remove_link(conn, *gone)
-            mainlog.info('Removed %s from links table', gone[0])
-    conn.commit()
-    conn.close()
+        #Unlink and remove old links from deleted collections
+        for gone in monitor.check_unlink(conn):
+            #mainlog.info('Removing link for %s', gone)
+            if linker.unlink(gone[0], gone[1], args.url, args.key):
+                mainlog.info('Removed link for %s', gone)
+                monitor.remove_link(conn, *gone)
+                mainlog.info('Removed %s from links table', gone[0])
+        conn.commit()
+        conn.close()
+    except Exception as err:
+        mainlog.exception(err)
+        mainlog.exception(traceback.format_exc()) 
+        raise
 
 if __name__ == '__main__':
     main()
