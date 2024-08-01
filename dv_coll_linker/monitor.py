@@ -190,6 +190,8 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
     diff = oldpids - newpids
     if len(diff) == 1: #Otherwise executemany iterates over a string
         diff = [tuple(diff)]
+    else:
+        diff = [(x,) for x in diff]#executemany must be fed tuples
     LOGGER.debug('oldpids: %s', oldpids)
     LOGGER.debug('newpids: %s', newpids)
     LOGGER.warning('PIDs to purge: %s', diff)
@@ -202,7 +204,7 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
             LOGGER.info('Records purged from *links*: %s', diff)
         except sqlite3.ProgrammingError as err:
             LOGGER.exception(err)
-            LOGGER.exception(traceback.format_exc())
+            #LOGGER.exception(traceback.format_exc())
             LOGGER.critical('Problematic diff:')
             LOGGER.critical(diff)
             raise
