@@ -13,6 +13,7 @@ This module basically acts as a singleton object on import.
 import json
 import logging
 import sqlite3
+import traceback
 #import sys
 import pkg_resources
 
@@ -193,11 +194,18 @@ def purge_nonexistent(conn:sqlite3.Connection, allrecs:dict) -> None:
     LOGGER.debug('newpids: %s', newpids)
     LOGGER.warning('PIDs to purge: %s', diff)
     if diff:
-        LOGGER.info('Purging %s old records', len(diff))
-        cursor.executemany('DELETE FROM studies WHERE pid=?;', diff)
-        LOGGER.info('Records purged from *studies*: %s', diff)
-        cursor.executemany('DELETE FROM links WHERE pid=?;', diff)
-        LOGGER.info('Records purged from *links*: %s', diff)
+        try:
+            LOGGER.info('Purging %s old records', len(diff))
+            cursor.executemany('DELETE FROM studies WHERE pid=?;', diff)
+            LOGGER.info('Records purged from *studies*: %s', diff)
+            cursor.executemany('DELETE FROM links WHERE pid=?;', diff)
+            LOGGER.info('Records purged from *links*: %s', diff)
+        except sqlite3.ProgrammingError as err:
+            LOGGER.exception(err)
+            LOGGER.exception(traceback.format_exc())
+            LOGGER.critical('Problematic diff:')
+            LOGGER.critical(diff)
+            raise
     conn.commit()
 
 def check_link_old(conn:sqlite3.Connection, pid:str) -> bool:
