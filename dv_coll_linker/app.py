@@ -60,9 +60,33 @@ from dv_coll_linker import search
 #I like this formatting better
 FORMATTER = logging.Formatter(('{asctime} - {levelname} - {name} - '
                                '{funcName} - {message}'), style='{')
-LEVEL = logging.INFO
+#logging no longer explicitly set
+#LEVEL = logging.INFO
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 DEFAULTDATE = '0001-01-01T00:00:00Z' #publishing predating this is unlikely
+
+def produce_level(inval:str):
+    '''
+    Return a log level from nearly arbitrary input.
+    If you pick something it doesn't like you'll get
+    logging.WARNING and you'll like it.
+    '''
+    ll = {'debug': logging.DEBUG,
+          'info': logging.INFO,
+          'warning': logging.WARNING,
+          'error': logging.ERROR,
+          'critical': logging.CRITICAL,
+          '10': logging.DEBUG,
+          '20': logging.INFO,
+          '30': logging.WARNING,
+          '40': logging.ERROR,
+          '50': logging.CRITICAL}
+    try:
+        output = ll[str(inval).lower()]
+    except KeyError:
+        output = logging.WARNING
+    return output
+
 
 def argument_parser() -> argparse.ArgumentParser:
     '''
@@ -116,6 +140,13 @@ def argument_parser() -> argparse.ArgumentParser:
                         help=('Log directory. Defaults to ~/logs. Log is saved '
                               'as dv_coll_linker.log'),
                         default=os.path.expanduser('~/logs'))
+    parser.add_argument('-e', '--log-level',
+                        help=('Log level. Use an integer as per '
+                              'https://docs.python.org/3/library/logging.html'
+                              ' more specifically, logging levels. '
+                              'Default = warning '),
+                        dest = 'level',
+                        default='warning')
     ##Do I really want to do it this way, or do I just add it to crontab? No
     #parser.add_argument('-z', '--daemonize',
     #                    help=('Run as daemon'),
@@ -124,7 +155,7 @@ def argument_parser() -> argparse.ArgumentParser:
     #                    help=('Update check interval in minutes if daemonized. '
     #                          'Default: 10'),
     #                    default=10)
-    parser.add_argument('-v''--version', action='version',
+    parser.add_argument('-v','--version', action='version',
                         version='%(prog)s '+dv_coll_linker.__version__,
                         help='Show version number and exit')
     return parser
@@ -148,7 +179,7 @@ def rotating_logger(path:str, level:int, fname='dv_coll_linker.log') -> logging.
     #logger = logging.getLogger(__name__)#if you don't want formatting for submodules
     logger = logging.getLogger()#root logger
     for name in ['linker', 'monitor', 'search']:
-        logging.getLogger(name).setLevel(LEVEL)
+        logging.getLogger(name).setLevel(level)
 
     rotator = logging.handlers.RotatingFileHandler(filename=os.path.join(path,fname),
                                                    maxBytes=10*1024**2,
@@ -163,9 +194,10 @@ def main():
     Primary
     '''
     args = argument_parser().parse_args()
+    args.level = produce_level(args.level)
     os.makedirs(os.path.split(os.path.expanduser(args.dbname))[0], exist_ok=True)
     os.makedirs(os.path.expanduser(args.log), exist_ok=True)
-    mainlog = rotating_logger(args.log, LEVEL)
+    mainlog = rotating_logger(args.log, args.level)
     #mainlog = console_logger(LEVEL)
 
     #create database if if doesn't exist
@@ -253,7 +285,7 @@ def main():
         conn.close()
     except Exception as err:
         mainlog.exception(err)
-        mainlog.exception(traceback.format_exc()) 
+        mainlog.exception(traceback.format_exc())
         raise
 
 if __name__ == '__main__':
