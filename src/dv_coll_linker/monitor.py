@@ -268,16 +268,29 @@ def get_last_count(conn:sqlite3.Connection) -> (str, int):
         return None, 0
     return last_count
 
-def get_search_data(conn:sqlite3.Connection)->dict:
+def decode_blob(inblob:bytes, json_filename='raw_data.json'):
     '''
-    Retrieves last harvested search results
+    Decode the JSON blob into text
+    '''
+    with zipfile.ZipFile(io.BytesIO(inblob)) as f:
+        with f.open(json_filename) as g:
+            raw_data = g.read()
+    retrieved_json = json.load(io.BytesIO(raw_data))
+    return retrieved_json
+
+def get_search_data(conn:sqlite3.Connection, json_filename='raw_data.json')->dict:
+    '''
+    Retrieves last harvested search results.
+    json_filename is the json name as encoded in the zipfile blob.
+    See write_search_data.
     '''
     cursor=conn.cursor()
     cursor.execute('SELECT * FROM raw_data ORDER BY last_check DESC LIMIT 1')
     outdata = cursor.fetchone()
     if outdata:
-        return json.loads(outdata[1])
+        return decode_blob(outdata[1], json_filename)
     return None
+
 
 def create_blob(zfname, text:str):
     '''
@@ -305,6 +318,8 @@ def write_search_data(conn:sqlite3.Connection, last_check:str,
     file = zipfile.ZipFile(io.BytesIO([data from sqlite3])
     raw_data = f.open(json_filename) (see above)
     retrieved_json = json.load(io.BytesIO(raw_data.read()))
+
+    see also decode_blob
 
     '''
     cursor = conn.cursor()

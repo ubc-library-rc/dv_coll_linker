@@ -1,6 +1,6 @@
 [project]
 name = "dv-coll-linker"
-version = "0.6.0"
+version = "0.7.0"
 description = "Collection linkage tool for IQSS dataverse for older installations"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
