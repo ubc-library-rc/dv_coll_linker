@@ -28,7 +28,7 @@ def get_total_records(baseurl:str = 'https://abacus.library.ubc.ca') -> int:
     Dataverse installation (ie, total number of data sets)
     '''
     #just getting count, minimum is 1, which is the fastest
-    req = requests.get(f'{baseurl}/api/search?q=*&type=dataset&per_page=1')
+    req = requests.get(f'{baseurl}/api/search?q=*&type=dataset&per_page=1', timeout=30)
     req.raise_for_status()
     LOGGER.info('%s total records found', req.json()['data']['total_count'])
     return req.json()['data']['total_count']

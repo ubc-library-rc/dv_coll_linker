@@ -34,5 +34,5 @@ last_count INT);
 
 CREATE TABLE IF NOT EXISTS raw_data
 ( last_check TEXT,
-search_json TEXT,
+search_json BLOB,
 FOREIGN KEY (last_check) REFERENCES status(last_check));

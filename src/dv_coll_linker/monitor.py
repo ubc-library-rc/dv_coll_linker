@@ -10,25 +10,15 @@ linker and search modules.
 This module basically acts as a singleton object on import.
 
 '''
+import io
+import importlib.resources
 import json
 import logging
 import sqlite3
-import traceback
 #import sys
-import pkg_resources
+import zipfile
 
 LOGGER = logging.getLogger(__name__)
-
-#if sys.version_info[1] >= 7:
-#    import importlib.resources as ilib
-#    try:
-#        from . import data
-#    except ImportError:
-#        import data
-#else:
-#    LOGGER.warning('Using Python 3.6 or below')
-#    #import importlib_resources as ilib
-#    import pkg_resources
 
 try:
     import psycopg2
@@ -38,20 +28,10 @@ except (ModuleNotFoundError, ImportError):
 
 def init(dbname:str) -> sqlite3.Connection:
     '''Intialize database with {dbname}.'''
-    #sqlite3.IntegrityError
-
-    #if sys.version_info[1] >= 7:
-    #    create = ilib.read_text(data, 'create_tables.sql').split('\n\n')
-    #    #create = [x.replace('\n', ' ') for x in create]
-    #else:
-    #    #pkg_resources.resource_filename('dv_coll_linker', 'data/create_tables.sql')
-    #    with open(pkg_resources.resource_filename('dv_coll_linker',
-    #                                              'data/create_tables.sql'),
-    #            'r', encoding='utf-8') as fil:
-    #        create = fil.read().split('\n\n')
-    with open(pkg_resources.resource_filename('dv_coll_linker',
-                                              'data/create_tables.sql'),
-            'r', encoding='utf-8') as fil:
+    with open(importlib.resources.files(
+                    'dv_coll_linker.data').joinpath(
+                    'create_tables.sql'), mode='r',
+                  encoding='utf-8') as fil:
         create = fil.read().split('\n\n')
         LOGGER.info('Read database initialization SQL')
         LOGGER.info('%s', create)
@@ -299,14 +279,41 @@ def get_search_data(conn:sqlite3.Connection)->dict:
         return json.loads(outdata[1])
     return None
 
-def write_search_data(conn:sqlite3.Connection, last_check:str, search_json:dict)->None:
+def create_blob(zfname, text:str):
     '''
-    Writes the current study search JSON to the database
+    Convert a string object into a blob of a zipfile
+    '''
+    zdata = io.BytesIO()
+    with zipfile.ZipFile(zdata, mode='w',
+                         compression=zipfile.ZIP_DEFLATED,
+                         compresslevel=9) as zipme:
+        zipme.writestr(zfname, text)
+    zdata.seek(0)
+    blob = zdata.read()
+    return blob
+
+
+def write_search_data(conn:sqlite3.Connection, last_check:str,
+                      search_json:dict, json_filename='raw_data.json')->None:
+    '''
+    Writes the current study search JSON to the database.
+    Data is written as a zipfile blob because the JSON
+    returned by Dataverse can be hundreds of thousands of lines log.
+
+    To retrieve, retrieve as a bytes object and either write as a zip file
+    (with arbitrary name)
+    file = zipfile.ZipFile(io.BytesIO([data from sqlite3])
+    raw_data = f.open(json_filename) (see above)
+    retrieved_json = json.load(io.BytesIO(raw_data.read()))
+
     '''
     cursor = conn.cursor()
+    #write the blob
     cursor.execute('INSERT INTO raw_data VALUES (?, ?)',
-                   (last_check, json.dumps(search_json)))
+                   (last_check,
+                    create_blob(json_filename, json.dumps(search_json))))
     conn.commit()
+    cursor.execute('VACUUM')
 
 ##based on time.now() - 1d/1h/10min if no time provided
 

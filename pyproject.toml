@@ -1,0 +1,46 @@
+[project]
+name = "dv-coll-linker"
+version = "0.6.0"
+description = "Collection linkage tool for IQSS dataverse for older installations"
+authors = [
+    {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
+]
+license = "MIT"
+readme = "README.md"
+keywords = ['Dataverse', 'collections', 'dataverse.org']
+requires-python = ">=3.13, <4.0"
+dependencies = [
+    "psycopg2-binary (>=2.9.13,<3.0.0)",
+    "requests (>=2.34.2,<3.0.0)"
+]
+
+classifiers = ['Development Status :: 4 - Beta',
+                     'Intended Audience :: Education',
+                     'License :: OSI Approved :: MIT License',
+                     'Programming Language :: Python :: 3.6',
+                     'Programming Language :: Python :: 3.7',
+                     'Programming Language :: Python :: 3.8',
+                     'Programming Language :: Python :: 3.9',
+                     'Programming Language :: Python :: 3.10',
+                     'Topic :: Education']
+[project.urls]
+Documentation = 'https://ubc-library-rc.github.io/dv_coll_linker'
+Repository = 'https://github.com/ubc-library-rc/dv_coll_linker'
+'Issue Tracker' = 'https://github.com/ubc-library-rc/dv_coll_linker/issues'
+
+[tool.poetry]
+include = ["dv_coll_linker/data/create_tables.sql"]
+packages = [{"include" = "dv_coll_linker", "from"="src"}]
+
+[tool.poetry.group.dev.dependencies]
+pylint = ">=3.3.6"
+mkdocs = ">=1.6.1"
+pydoc-markdown = ">=4.8.2"
+mkdocstrings-python = ">=2.0.3"
+
+[project.scripts]
+dv_coll_linker = 'dv_coll_linker.app:main'
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -189,10 +189,11 @@ def rotating_logger(path:str, level:int, fname='dv_coll_linker.log') -> logging.
     logger.setLevel(level)
     return logger
 
-def main():
+def main():#pylint: disable = too-many-locals
     '''
     Primary
     '''
+    #pylint-disable: too-many-locals
     args = argument_parser().parse_args()
     args.level = produce_level(args.level)
     os.makedirs(os.path.split(os.path.expanduser(args.dbname))[0], exist_ok=True)
